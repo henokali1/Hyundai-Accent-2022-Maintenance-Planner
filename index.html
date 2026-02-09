@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hyundai Accent Maintenance Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.3);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="range"],
+    input[type="number"] {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .replace {
+      background: #7c2d12;
+      color: #fed7aa;
+    }
+
+    .inspect {
+      background: #1e3a8a;
+      color: #bfdbfe;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: .75rem;
+      opacity: .6;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Hyundai Accent 2022<br>Maintenance Planner</h1>
+
+  <div class="card">
+    <label for="mileage">Select Current Mileage (km)</label>
+    <input type="range" id="mileage" min="100000" max="200000" step="1000" value="100000">
+    <input type="number" id="mileageInput" min="100000" max="200000" step="1000" value="100000">
+    <p><strong>Service Interval:</strong> <span id="interval">100,000 km</span></p>
+  </div>
+
+  <div class="card">
+    <h2>🔧 Replacements</h2>
+    <ul id="replacements"></ul>
+  </div>
+
+  <div class="card">
+    <h2>👁️ Inspections</h2>
+    <ul id="inspections"></ul>
+  </div>
+
+  <footer>
+    Accent 2022 • Smartstream G1.6 • Offline PWA
+  </footer>
+
+<script>
+const mileageSlider = document.getElementById('mileage');
+const mileageInput  = document.getElementById('mileageInput');
+const intervalText  = document.getElementById('interval');
+const replacementsEl = document.getElementById('replacements');
+const inspectionsEl  = document.getElementById('inspections');
+
+const baseInspections = [
+  "Brake pads & discs",
+  "Steering & suspension",
+  "Driveshafts & CV boots",
+  "Fuel lines & hoses",
+  "Battery condition",
+  "Exhaust system",
+  "Air conditioning system",
+  "Tires (rotation, pressure, wear)"
+];
+
+function updateMaintenance(mileage) {
+  const interval = Math.floor(mileage / 10000) * 10000;
+  intervalText.textContent = interval.toLocaleString() + " km";
+
+  const replacements = [
+    "Engine oil & oil filter",
+    "Cabin (AC) air filter"
+  ];
+
+  const inspections = [...baseInspections];
+
+  // Conditional replacements
+  if (interval === 120000 || interval === 180000) {
+    replacements.push("Engine coolant");
+    replacements.push("Brake / clutch fluid");
+  }
+
+  if (interval === 144000 || interval === 180000) {
+    replacements.push("Air cleaner filter");
+  }
+
+  if (interval === 156000) {
+    replacements.push("Spark plugs");
+  }
+
+  if (interval >= 160000) {
+    inspections.push("Severe schedule inspection logic applied");
+  }
+
+  renderList(replacementsEl, replacements, "replace");
+  renderList(inspectionsEl, inspections, "inspect");
+}
+
+function renderList(element, items, type) {
+  element.innerHTML = "";
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="badge ${type}">${type === "replace" ? "R" : "I"}</span> ${item}`;
+    element.appendChild(li);
+  });
+}
+
+mileageSlider.addEventListener('input', e => {
+  mileageInput.value = e.target.value;
+  updateMaintenance(Number(e.target.value));
+});
+
+mileageInput.addEventListener('input', e => {
+  mileageSlider.value = e.target.value;
+  updateMaintenance(Number(e.target.value));
+});
+
+// Initial load
+updateMaintenance(100000);
+</script>
+
+</body>
+</html>
